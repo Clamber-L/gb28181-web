@@ -1,0 +1,73 @@
+{
+    "name": "react-docs-project",
+    "private": true,
+    "version": "0.0.0",
+    "scripts": {
+        "dev": "vite",
+        "build": "tsc && vite build",
+        "preview": "vite preview"
+    },
+    "dependencies": {
+        "@ant-design/icons": "^6.0.0",
+        "antd": "^5.27.2",
+        "axios": "^1.11.0",
+        "dayjs": "^1.11.10",
+        "deepmerge": "^4.3.1",
+        "js-cookie": "^3.0.5",
+        "moment": "^2.29.4",
+        "page-agent": "^1.6.2",
+        "qs": "^6.11.2",
+        "ramda": "^0.31.3",
+        "react": "^18.2.0",
+        "react-dom": "^18.2.0",
+        "react-router-dom": "^6.17.0",
+        "zustand": "^4.4.6"
+    },
+    "devDependencies": {
+        "@types/js-cookie": "^3.0.6",
+        "@types/qs": "^6.9.11",
+        "@types/ramda": "^0.31.1",
+        "@types/react": "^18.2.15",
+        "@types/react-dom": "^18.2.7",
+        "@types/react-router-dom": "^5.3.3",
+        "@typescript-eslint/eslint-plugin": "^6.9.0",
+        "@typescript-eslint/parser": "^6.9.0",
+        "@vitejs/plugin-react": "^4.0.3",
+        "autoprefixer": "^10.4.16",
+        "eslint": "^8.52.0",
+        "eslint-config-airbnb": "^19.0.4",
+        "eslint-config-airbnb-typescript": "^17.1.0",
+        "eslint-config-prettier": "^9.0.0",
+        "eslint-plugin-import": "^2.29.0",
+        "eslint-plugin-jest": "^27.6.0",
+        "eslint-plugin-jsx-a11y": "^6.7.1",
+        "eslint-plugin-prettier": "^5.0.1",
+        "eslint-plugin-react": "^7.33.2",
+        "eslint-plugin-react-hooks": "^4.6.0",
+        "eslint-plugin-unused-imports": "^3.0.0",
+        "jest": "^29.7.0",
+        "postcss": "^8.4.31",
+        "postcss-import": "^15.1.0",
+        "postcss-mixins": "^9.0.4",
+        "postcss-nested": "^6.0.1",
+        "postcss-nesting": "^12.0.1",
+        "prettier": "^3.0.3",
+        "tailwindcss": "^3.3.5",
+        "typescript": "^5.0.2",
+        "vite": "^4.4.4"
+    },
+    "pnpm": {
+        "updateConfig": {
+            "ignoreDependencies": [
+                "eslint",
+                "eslint-plugin-unused-imports"
+            ]
+        },
+        "peerDependencyRules": {
+            "allowAny": [
+                "eslint",
+                "@typescript-eslint/*"
+            ]
+        }
+    }
+}

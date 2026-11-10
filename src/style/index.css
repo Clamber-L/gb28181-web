@@ -1,0 +1,76 @@
+/* 只保留必要的 Tailwind CSS 导入和基础样式 */
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+/* 基础样式重置 */
+html,
+body {
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* 全局暗色模式样式 */
+.dark {
+    color-scheme: dark;
+}
+
+/* 确保根元素的背景色切换 */
+html {
+    @apply bg-gray-100 text-gray-900;
+}
+
+html.dark {
+    @apply bg-black text-gray-100;
+}
+
+/* 确保body的背景色切换 */
+body {
+    @apply bg-gray-100 text-gray-900;
+}
+
+body.dark {
+    @apply bg-black text-gray-100;
+}
+
+/* 主应用容器样式 */
+#root {
+    min-height: 100vh;
+    @apply bg-gray-100 text-gray-900;
+}
+
+.dark #root {
+    @apply bg-black text-gray-100;
+}
+
+/* 自定义滚动条样式 */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    @apply bg-gray-100;
+}
+
+.dark ::-webkit-scrollbar-track {
+    @apply bg-gray-900;
+}
+
+::-webkit-scrollbar-thumb {
+    @apply bg-gray-300 rounded-full;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+    @apply bg-gray-600 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    @apply bg-gray-400;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+    @apply bg-gray-500;
+}
