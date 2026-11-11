@@ -20,7 +20,7 @@ const WorkInProgressPage: React.FC<{ title?: string; description?: string }> = (
                 <Paragraph className="text-gray-600 dark:text-gray-400">{description}</Paragraph>
                 <Space>
                     <Button onClick={() => navigate(-1)}>返回上页</Button>
-                    <Button type="primary" onClick={() => navigate(ROUTES.DASHBOARD_CONSOLE)}>
+                    <Button type="primary" onClick={() => navigate(ROUTES.CAMERA)}>
                         回到首页
                     </Button>
                 </Space>

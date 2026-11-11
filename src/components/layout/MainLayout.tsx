@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { Layout } from 'antd';
 import { Outlet } from 'react-router-dom';
+import { Suspense } from 'react';
 
-import { Breadcrumb, Sidebar } from '@/components';
-
-import { AppHeader } from '../index';
+import Sidebar from './Sidebar';
+import AppHeader from './AppHeader';
+import CircleLoading from '@/components/loading/CircleLoading';
 
 const { Content } = Layout;
 
@@ -16,11 +17,11 @@ const MainLayout: React.FC = () => {
             <Sidebar collapsed={collapsed} onCollapse={setCollapsed} />
             <Layout>
                 <AppHeader collapsed={collapsed} onCollapse={setCollapsed} />
-                {/* 面包屑导航 */}
-                <Breadcrumb />
                 <Content className="bg-gray-100 dark:bg-gray-900 transition-colors">
                     <div className="p-6">
-                        <Outlet />
+                        <Suspense fallback={<CircleLoading />}>
+                            <Outlet />
+                        </Suspense>
                     </div>
                 </Content>
             </Layout>

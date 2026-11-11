@@ -39,7 +39,7 @@ const AppHeader: React.FC<AppHeaderProps> = ({ collapsed, onCollapse }) => {
                     className="text-lg"
                 />
                 <div className="ml-4 text-xl font-bold text-gray-800 dark:text-gray-200">
-                    Art Design Pro
+                    GB28181 视频管理平台
                 </div>
             </div>
 
@@ -52,9 +52,9 @@ const AppHeader: React.FC<AppHeaderProps> = ({ collapsed, onCollapse }) => {
                     title={isDark ? '切换到亮色模式' : '切换到暗色模式'}
                 />
                 <div className="flex items-center gap-2">
-                    <Avatar src={userInfo?.avatar} icon={<UserOutlined />} size="small" />
+                    <Avatar icon={<UserOutlined />} size="small" />
                     <span className="text-gray-700 dark:text-gray-300 text-sm hidden sm:inline">
-                        {userInfo?.username || '用户'}
+                        {userInfo?.username || 'admin'}
                     </span>
                 </div>
                 <Button

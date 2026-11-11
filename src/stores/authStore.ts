@@ -39,9 +39,7 @@ interface AuthState {
 
 // 获取存储的初始状态
 const getInitialState = () => ({
-    // 为了演示目的，默认设置为已登录状态
-    // 在实际项目中应该设置为 false
-    isLogin: true,
+    isLogin: false,
     loading: false,
     userInfo: {} as UserInfo,
     accessToken: '',
@@ -81,12 +79,6 @@ export const authStore = create<AuthState>()(
                 set({
                     ...getInitialState(),
                 });
-
-                // 清除其他相关存储
-                sessionStorage.removeItem('appRoutes');
-
-                // 重定向到登录页面将在组件中处理
-                localStorage.removeItem('auth-storage');
             },
 
             // 清除认证信息
