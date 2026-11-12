@@ -64,8 +64,7 @@ interface DeviceChannelRecord {
     parentDeviceId: string;
     deviceChannelId: string;
     deviceChannelName: string;
-    parentDeviceChannelId: string;
-    deviceAudioChannelName: string;
+    deviceMode: string;
 }
 
 interface TableInfoData<T> {
@@ -127,7 +126,11 @@ const CameraManagement: React.FC = () => {
     // 同步弹窗
     const [syncModalOpen, setSyncModalOpen] = useState(false);
     const [syncLoading, setSyncLoading] = useState(false);
-    const [syncChannel, setSyncChannel] = useState<DeviceChannelRecord | null>(null);
+    const [syncVideoDeviceId, setSyncVideoDeviceId] = useState<string | undefined>(undefined);
+    const [syncAudioDeviceId, setSyncAudioDeviceId] = useState<string | undefined>(undefined);
+    const [syncAudioDeviceParent, setSyncAudioDeviceParent] = useState<string | undefined>(undefined);
+    const [syncAudioChannelList, setSyncAudioChannelList] = useState<DeviceChannelRecord[]>([]);
+    const [syncAudioChannelLoading, setSyncAudioChannelLoading] = useState(false);
     const [syncCameraType, setSyncCameraType] = useState('normal');
     const [syncFireRoomCamera, setSyncFireRoomCamera] = useState(false);
     const [syncAudioCamera, setSyncAudioCamera] = useState(false);
@@ -187,7 +190,7 @@ const CameraManagement: React.FC = () => {
         setDetailModalOpen(true);
     };
 
-    const handleSyncChannel = (record: DeviceChannelRecord) => {
+    const handleOpenSyncModal = () => {
         const config = getSystemConfig();
         if (!config.orgName?.trim()) {
             message.warning('请先在系统设置中填写单位名称');
@@ -197,15 +200,40 @@ const CameraManagement: React.FC = () => {
             message.warning('请先在系统设置中填写上游服务器地址');
             return;
         }
-        setSyncChannel(record);
+        setSyncVideoDeviceId(undefined);
+        setSyncAudioDeviceId(undefined);
+        setSyncAudioDeviceParent(undefined);
+        setSyncAudioChannelList([]);
         setSyncCameraType('normal');
         setSyncFireRoomCamera(false);
         setSyncAudioCamera(false);
         setSyncModalOpen(true);
     };
 
+    const handleAudioDeviceChange = async (deviceId: string) => {
+        setSyncAudioDeviceParent(deviceId);
+        setSyncAudioDeviceId(undefined);
+        setSyncAudioChannelLoading(true);
+        try {
+            const res = await fetchChannelList(deviceId);
+            setSyncAudioChannelList(res || []);
+        } catch {
+            message.error('获取音频设备通道失败');
+            setSyncAudioChannelList([]);
+        } finally {
+            setSyncAudioChannelLoading(false);
+        }
+    };
+
     const handleSyncConfirm = async () => {
-        if (!syncChannel) return;
+        if (!syncVideoDeviceId) {
+            message.warning('请选择视频通道');
+            return;
+        }
+        if (!syncAudioDeviceId) {
+            message.warning('请选择音频通道');
+            return;
+        }
         const baseUrl = getApiBaseUrl();
         const config = getSystemConfig();
         setSyncLoading(true);
@@ -214,8 +242,8 @@ const CameraManagement: React.FC = () => {
                 url: `${baseUrl}/api/camera_upload/syncChannel`,
                 data: {
                     orgName: config.orgName,
-                    deviceChannelId: syncChannel.deviceChannelId,
-                    parentDeviceChannelId: syncChannel.parentDeviceChannelId || '',
+                    videoDeviceId: syncVideoDeviceId,
+                    audioDeviceId: syncAudioDeviceId,
                     cameraType: syncCameraType,
                     upstreamAddr: config.upstreamAddr,
                     serverAddr: config.serverAddr,
@@ -354,33 +382,10 @@ const CameraManagement: React.FC = () => {
             render: (text: string) => text || '-',
         },
         {
-            title: '音频通道ID',
-            dataIndex: 'parentDeviceChannelId',
-            key: 'parentDeviceChannelId',
-            width: 220,
+            title: '设备型号',
+            dataIndex: 'deviceMode',
+            key: 'deviceMode',
             render: (text: string) => text || '-',
-        },
-        {
-            title: '音频通道名称',
-            dataIndex: 'deviceAudioChannelName',
-            key: 'deviceAudioChannelName',
-            render: (text: string) => text || '-',
-        },
-        {
-            title: '操作',
-            key: 'action',
-            width: 100,
-            align: 'center',
-            render: (_: unknown, record: DeviceChannelRecord) => (
-                <Button
-                    type="link"
-                    size="small"
-                    icon={<SyncOutlined />}
-                    onClick={() => handleSyncChannel(record)}
-                >
-                    同步
-                </Button>
-            ),
         },
     ];
 
@@ -475,11 +480,23 @@ const CameraManagement: React.FC = () => {
 
             {/* 通道列表弹窗 */}
             <Modal
-                title={`通道列表 - ${channelDeviceName}`}
+                title={
+                    <div className="flex justify-between items-center pr-8">
+                        <span>{`通道列表 - ${channelDeviceName}`}</span>
+                        <Button
+                            type="primary"
+                            icon={<SyncOutlined />}
+                            onClick={handleOpenSyncModal}
+                            disabled={channelData.length === 0}
+                        >
+                            同步
+                        </Button>
+                    </div>
+                }
                 open={channelModalOpen}
                 onCancel={() => setChannelModalOpen(false)}
                 footer={null}
-                width={1000}
+                width={800}
                 destroyOnClose
             >
                 <Table
@@ -504,23 +521,57 @@ const CameraManagement: React.FC = () => {
             >
                 <div className="space-y-4 py-2">
                     <div>
-                        <span className="text-gray-500 mr-2">通道编号:</span>
-                        <span>{syncChannel?.deviceChannelId}</span>
+                        <span className="text-gray-500 mr-2">视频通道:</span>
+                        <Select
+                            value={syncVideoDeviceId}
+                            onChange={setSyncVideoDeviceId}
+                            placeholder="请选择视频通道"
+                            options={channelData.map((ch) => ({
+                                label: `${ch.deviceChannelName || ch.deviceChannelId} (${ch.deviceChannelId})`,
+                                value: ch.deviceChannelId,
+                            }))}
+                            style={{ width: 360 }}
+                            showSearch
+                            optionFilterProp="label"
+                        />
                     </div>
-                    {syncChannel?.parentDeviceChannelId && (
-                        <div>
-                            <span className="text-gray-500 mr-2">音频通道编号:</span>
-                            <span>{syncChannel.parentDeviceChannelId}</span>
-                        </div>
-                    )}
+                    <div>
+                        <span className="text-gray-500 mr-2">音频设备:</span>
+                        <Select
+                            value={syncAudioDeviceParent}
+                            onChange={handleAudioDeviceChange}
+                            placeholder="请选择音频所在设备"
+                            options={data.map((d) => ({
+                                label: `${d.deviceName || d.deviceId} (${d.deviceId})`,
+                                value: d.deviceId,
+                            }))}
+                            style={{ width: 360 }}
+                            showSearch
+                            optionFilterProp="label"
+                        />
+                    </div>
+                    <div>
+                        <span className="text-gray-500 mr-2">音频通道:</span>
+                        <Select
+                            value={syncAudioDeviceId}
+                            onChange={setSyncAudioDeviceId}
+                            placeholder={syncAudioDeviceParent ? '请选择音频通道' : '请先选择音频设备'}
+                            options={syncAudioChannelList.map((ch) => ({
+                                label: `${ch.deviceChannelName || ch.deviceChannelId} (${ch.deviceChannelId})`,
+                                value: ch.deviceChannelId,
+                            }))}
+                            style={{ width: 360 }}
+                            showSearch
+                            optionFilterProp="label"
+                            disabled={!syncAudioDeviceParent}
+                            loading={syncAudioChannelLoading}
+                        />
+                    </div>
                     <div>
                         <span className="text-gray-500 mr-2">摄像头类型:</span>
                         <Select
                             value={syncCameraType}
-                            onChange={(v) => {
-                                setSyncCameraType(v);
-                                if (v !== 'absence') setSyncAudioCamera(false);
-                            }}
+                            onChange={setSyncCameraType}
                             options={CAMERA_TYPE_OPTIONS}
                             style={{ width: 200 }}
                         />
@@ -534,7 +585,6 @@ const CameraManagement: React.FC = () => {
                         <Switch
                             checked={syncAudioCamera}
                             onChange={setSyncAudioCamera}
-                            disabled={syncCameraType !== 'absence'}
                         />
                     </div>
                 </div>
